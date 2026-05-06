@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="jdbc:h2:mem:greengrid;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE [DEBUG]" group="​BackendApiApplication" uuid="c0de93b9-25c4-4e52-a769-fd7c3b9738a8">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:mem:greengrid;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+  </component>
+</project>

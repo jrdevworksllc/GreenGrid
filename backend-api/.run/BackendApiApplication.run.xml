@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BackendApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="backend-api.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.greengrid.backendapi.BackendApiApplication" />
+    <option name="VM_PARAMETERS" value="-Dserver.port=8091" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
