@@ -1,0 +1,47 @@
+name: Agent Task
+description: Executable task for OpenClaw queue.
+title: "[Task] "
+labels: ["ready", "agent-safe"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What outcome should be achieved?
+      placeholder: Implement ...
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What files/systems are in scope and out of scope?
+      placeholder: In scope ... Out of scope ...
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Checklist of required outcomes.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test Plan
+      description: Exact commands/checks the agent should run.
+      placeholder: npm test, gradlew test, manual smoke ...
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Risk Notes
+      description: Optional rollback/risk notes.
+      placeholder: Optional
+    validations:
+      required: false
