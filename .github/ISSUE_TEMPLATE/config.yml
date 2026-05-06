@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: GreenGrid Queue Guide
+    url: https://github.com/jrdevworksllc/GreenGrid/blob/main/TASK_QUEUE.md
+    about: Read queue rules before creating tasks.
