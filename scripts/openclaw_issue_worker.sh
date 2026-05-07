@@ -8,6 +8,7 @@ REPO="${REPO:-jrdevworksllc/GreenGrid}"
 OPENCLAW_BIN="${OPENCLAW_BIN:-$HOME/.npm-global/bin/openclaw}"
 WORKDIR="${WORKDIR:-$HOME/GreenGrid}"
 WORKER_ENV_FILE="${WORKER_ENV_FILE:-$HOME/.config/greengrid/worker.env}"
+OPENCLAW_AGENT_ID="${OPENCLAW_AGENT_ID:-greengrid}"
 
 if [[ -f "$WORKER_ENV_FILE" ]]; then
   set -a
@@ -127,7 +128,7 @@ Requirements:
 - After coding, stop and let the outer automation run checks."
 
 set +e
-"$OPENCLAW_BIN" agent --local --agent main --message "$prompt"
+"$OPENCLAW_BIN" agent --local --agent "$OPENCLAW_AGENT_ID" --message "$prompt"
 agent_exit=$?
 set -e
 
