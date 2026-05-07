@@ -135,7 +135,7 @@ Requirements:
 - After coding, stop and let the outer automation run checks."
 
 set +e
-"$OPENCLAW_BIN" agent --local --agent "$OPENCLAW_AGENT_ID" --message "$prompt"
+"$OPENCLAW_BIN" agent --agent "$OPENCLAW_AGENT_ID" --message "$prompt"
 agent_exit=$?
 set -e
 
