@@ -81,7 +81,7 @@ run_checks() {
   echo "Running backend tests..."
   (cd "$WORKDIR/backend-api" && chmod +x gradlew && ./gradlew test --no-daemon)
   echo "Running frontend lint/build..."
-  (cd "$WORKDIR/frontend-web" && npm install && npm run lint && npm run build)
+  (cd "$WORKDIR/frontend-web" && rm -rf node_modules && npm ci && npm run lint && npm run build)
 }
 
 issue_json="$(api_get "https://api.github.com/repos/$REPO/issues?state=open&labels=ready,agent-safe&sort=created&direction=asc&per_page=1")"
@@ -132,7 +132,7 @@ agent_exit=$?
 set -e
 
 if [[ $agent_exit -ne 0 ]]; then
-  block_msg="$(python3 - <<PY
+  block_msg="$(python3 - <<'PY'
 import json
 print(json.dumps({"body":"OpenClaw agent run failed before code validation. Please inspect worker logs and rerun."}))
 PY
@@ -144,7 +144,7 @@ PY
 fi
 
 if [[ -z "$(git status --porcelain)" ]]; then
-  nochange_msg="$(python3 - <<PY
+  nochange_msg="$(python3 - <<'PY'
 import json
 print(json.dumps({"body":"Worker run completed with no code changes. Task remains ready for manual follow-up."}))
 PY
@@ -165,7 +165,7 @@ check_exit=$?
 set -e
 
 if [[ $check_exit -ne 0 ]]; then
-  fail_msg="$(python3 - <<PY
+  fail_msg="$(python3 - <<'PY'
 import json
 print(json.dumps({"body":"Automated checks failed (`backend-api` tests or `frontend-web` lint/build). Worker stopped and marked this issue as blocked for follow-up."}))
 PY
@@ -201,9 +201,10 @@ pr_url="$(echo "$pr_response" | python3 -c 'import sys, json; d=json.load(sys.st
 review_payload="$(set_issue_labels "$issue_number" "$issue_one" "review")"
 api_send PATCH "https://api.github.com/repos/$REPO/issues/$issue_number" "$review_payload" >/dev/null
 
-review_msg="$(python3 - <<PY
+review_msg="$(PR_URL="$pr_url" python3 - <<'PY'
 import json
-url = """$pr_url""".strip()
+import os
+url = os.environ.get("PR_URL", "").strip()
 body = f"Autonomous worker completed implementation and opened PR: {url}" if url else "Autonomous worker completed implementation and pushed branch, but PR creation response was empty."
 print(json.dumps({"body": body}))
 PY
