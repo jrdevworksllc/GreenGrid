@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, type ReactNode, useMemo, useState } from "react";
+import { FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import { PropertyMapEditor } from "@/components/PropertyMapEditor";
@@ -67,6 +67,12 @@ const stepDescriptions = [
 ] as const;
 
 const WHOLE_PROPERTY = "__whole_property__";
+const MARION_EXAMPLE = {
+  name: "Roosevelt Residence",
+  city: "Marion",
+  addressLine: "810 S. Roosevelt St.",
+  postalCode: "66861",
+};
 
 export function OnboardingFlow(props: OnboardingFlowProps) {
   const {
@@ -103,6 +109,15 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const [plantSearch, setPlantSearch] = useState("");
   const [plantCatalogId, setPlantCatalogId] = useState("");
   const [plantingInlineError, setPlantingInlineError] = useState("");
+  const [propertyName, setPropertyName] = useState(MARION_EXAMPLE.name);
+  const [propertyCity, setPropertyCity] = useState(MARION_EXAMPLE.city);
+  const [propertyAddress, setPropertyAddress] = useState(MARION_EXAMPLE.addressLine);
+  const [propertyPostalCode, setPropertyPostalCode] = useState(MARION_EXAMPLE.postalCode);
+  const [maintenancePreference, setMaintenancePreference] = useState("low");
+  const [budgetBand, setBudgetBand] = useState("mid");
+  const [colorMood, setColorMood] = useState("native-warm");
+  const [renderPerspective, setRenderPerspective] = useState("both");
+  const [photoPreviews, setPhotoPreviews] = useState<Array<{ name: string; url: string }>>([]);
 
   const zonePointCount = useMemo(() => {
     try {
@@ -179,6 +194,50 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
       return;
     }
     await runSubmit(event, onAddPlanting);
+  }
+
+  async function runDesignSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    try {
+      const formData = new FormData(event.currentTarget);
+      const basePrompt = String(formData.get("prompt") ?? "").trim();
+      const enrichedPrompt = [
+        basePrompt,
+        `Preferences: maintenance=${maintenancePreference}, budget=${budgetBand}, color mood=${colorMood}.`,
+        "Deliverables: include a practical implementation sequence and planting rationale.",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      formData.set("prompt", enrichedPrompt);
+      formData.set("style", `${String(formData.get("style") || "modern-natural")}--${renderPerspective}`);
+      const ok = await onGenerateDesign(formData);
+      if (ok) setActiveStep((value) => Math.min(value + 1, steps.length - 1));
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Something went wrong. Please retry.");
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    };
+  }, [photoPreviews]);
+
+  function handlePhotoChange(files: FileList | null) {
+    photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    if (!files || files.length === 0) {
+      setPhotoPreviews([]);
+      return;
+    }
+    const previews = Array.from(files)
+      .filter((file) => file.size > 0)
+      .slice(0, 6)
+      .map((file) => ({
+        name: file.name,
+        url: URL.createObjectURL(file),
+      }));
+    setPhotoPreviews(previews);
   }
 
   function handleSuggestZones() {
@@ -341,19 +400,64 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
               </CardHeader>
               <CardContent>
                 <form onSubmit={(event) => runSubmit(event, onCreateProperty)} className="space-y-4">
+                  <div className="rounded-lg border border-[var(--gg-border)]/80 bg-muted/20 p-3 text-xs text-muted-foreground">
+                    Quick start available for your MVP walkthrough.
+                    <Button
+                      type="button"
+                      size="xs"
+                      variant="outline"
+                      className="ml-2"
+                      onClick={() => {
+                        setPropertyName(MARION_EXAMPLE.name);
+                        setPropertyCity(MARION_EXAMPLE.city);
+                        setPropertyAddress(MARION_EXAMPLE.addressLine);
+                        setPropertyPostalCode(MARION_EXAMPLE.postalCode);
+                      }}
+                    >
+                      Use 810 S. Roosevelt St., Marion
+                    </Button>
+                  </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Property name" htmlFor="prop-name">
-                      <Input id="prop-name" name="name" placeholder="Home Garden" required />
+                      <Input
+                        id="prop-name"
+                        name="name"
+                        placeholder="Home Garden"
+                        value={propertyName}
+                        onChange={(e) => setPropertyName(e.target.value)}
+                        required
+                      />
                     </Field>
                     <Field label="City" htmlFor="prop-city">
-                      <Input id="prop-city" name="city" placeholder="Wichita" required />
+                      <Input
+                        id="prop-city"
+                        name="city"
+                        placeholder="Wichita"
+                        value={propertyCity}
+                        onChange={(e) => setPropertyCity(e.target.value)}
+                        required
+                      />
                     </Field>
                   </div>
                   <Field label="Street address" htmlFor="prop-address">
-                    <Input id="prop-address" name="addressLine" placeholder="123 Green Ave" required />
+                    <Input
+                      id="prop-address"
+                      name="addressLine"
+                      placeholder="123 Green Ave"
+                      value={propertyAddress}
+                      onChange={(e) => setPropertyAddress(e.target.value)}
+                      required
+                    />
                   </Field>
                   <Field label="ZIP code" htmlFor="prop-zip">
-                    <Input id="prop-zip" name="postalCode" placeholder="67202" required />
+                    <Input
+                      id="prop-zip"
+                      name="postalCode"
+                      placeholder="67202"
+                      value={propertyPostalCode}
+                      onChange={(e) => setPropertyPostalCode(e.target.value)}
+                      required
+                    />
                   </Field>
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
@@ -672,10 +776,10 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
             <Card className="border shadow-md ring-1 ring-border/55">
               <CardHeader>
                 <CardTitle className="text-base">Photos and prompt</CardTitle>
-                <CardDescription>Give the studio direction for concepts.</CardDescription>
+                <CardDescription>Give the studio direction for concepts and requested viewpoints.</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={(event) => runSubmit(event, onGenerateDesign)} className="space-y-4">
+                <form onSubmit={runDesignSubmit} className="space-y-4">
                   <input type="hidden" name="designZoneId" value={designZoneScope === WHOLE_PROPERTY ? "" : designZoneScope} />
                   <div className="space-y-2">
                     <Label>Scope</Label>
@@ -701,6 +805,65 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
                   <Field label="Style" htmlFor="style">
                     <Input id="style" name="style" defaultValue="modern-natural" required />
                   </Field>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Render perspective</Label>
+                      <Select value={renderPerspective} onValueChange={(value) => value && setRenderPerspective(value)}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Perspective" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="human">Human eye-level</SelectItem>
+                          <SelectItem value="birds-eye">Bird's-eye masterplan</SelectItem>
+                          <SelectItem value="both">Both perspectives</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Maintenance preference</Label>
+                      <Select
+                        value={maintenancePreference}
+                        onValueChange={(value) => value && setMaintenancePreference(value)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Maintenance" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low maintenance</SelectItem>
+                          <SelectItem value="moderate">Moderate maintenance</SelectItem>
+                          <SelectItem value="hands-on">Hands-on gardening</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Budget band</Label>
+                      <Select value={budgetBand} onValueChange={(value) => value && setBudgetBand(value)}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Budget band" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="lean">Lean</SelectItem>
+                          <SelectItem value="mid">Mid-range</SelectItem>
+                          <SelectItem value="premium">Premium</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Color mood</Label>
+                      <Select value={colorMood} onValueChange={(value) => value && setColorMood(value)}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Color mood" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="native-warm">Native warm</SelectItem>
+                          <SelectItem value="cool-structured">Cool structured</SelectItem>
+                          <SelectItem value="pollinator-vibrant">Pollinator vibrant</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   <Field label="Prompt" htmlFor="prompt">
                     <Textarea
                       id="prompt"
@@ -711,8 +874,35 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
                     />
                   </Field>
                   <Field label="Upload photos" htmlFor="photos">
-                    <Input id="photos" name="photos" type="file" multiple className="cursor-pointer bg-muted/30 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary-foreground" />
+                    <Input
+                      id="photos"
+                      name="photos"
+                      type="file"
+                      multiple
+                      onChange={(event) => handlePhotoChange(event.currentTarget.files)}
+                      className="cursor-pointer bg-muted/30 file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary-foreground"
+                    />
                   </Field>
+                  {photoPreviews.length > 0 && (
+                    <div className="space-y-2 rounded-lg border border-border/70 bg-muted/10 p-3">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Reference photos ready ({photoPreviews.length})
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        {photoPreviews.map((preview) => (
+                          <div key={preview.url} className="space-y-1">
+                            {/* eslint-disable-next-line @next/next/no-img-element -- local object URL preview */}
+                            <img
+                              src={preview.url}
+                              alt={preview.name}
+                              className="h-24 w-full rounded-md object-cover ring-1 ring-border"
+                            />
+                            <p className="truncate text-[11px] text-muted-foreground">{preview.name}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <Button type="submit" disabled={!property}>
                     {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
                     Generate options
@@ -740,11 +930,26 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
                         <SelectContent>
                           {designRequest.outputs.map((output) => (
                             <SelectItem key={output.id} value={output.id}>
-                              {output.label} — {output.outputUrl}
+                              {output.label} ({renderLabel(output.outputUrl)})
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {designRequest.outputs.map((output) => (
+                        <div
+                          key={output.id}
+                          className={cn(
+                            "rounded-lg border p-3 text-xs",
+                            selectedOutputId === output.id ? "border-primary bg-primary/5" : "border-border/70 bg-muted/10",
+                          )}
+                        >
+                          <p className="font-semibold">{output.label}</p>
+                          <p className="text-muted-foreground">{renderLabel(output.outputUrl)}</p>
+                          <p className="truncate text-muted-foreground/80">{output.outputUrl}</p>
+                        </div>
+                      ))}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Button
@@ -785,6 +990,14 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
       </div>
     </div>
   );
+}
+
+function renderLabel(outputUrl: string): string {
+  const lower = outputUrl.toLowerCase();
+  if (lower.includes("birds-eye")) return "Bird's-eye concept";
+  if (lower.includes("human")) return "Human-eye concept";
+  if (lower.includes("both")) return "Dual-perspective concept";
+  return "Concept render";
 }
 
 function Field({
