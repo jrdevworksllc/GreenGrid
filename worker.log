@@ -1,0 +1,145 @@
+Processing issue #1 -> issue-1-mvp1-polish-improve-hero-dashboa
+Switched to branch 'main'
+M	backend-api/gradlew
+Your branch is up to date with 'origin/main'.
+From https://github.com/jrdevworksllc/GreenGrid
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Switched to a new branch 'issue-1-mvp1-polish-improve-hero-dashboa'
+M	backend-api/gradlew
+To implement GitHub issue #1, here's a structured plan:
+
+### 1. **Review Current UI**
+- Examine the current state of the hero section and dashboard.
+- Identify areas with spacing, hierarchy, or clarity issues.
+
+### 2. **Design Improvements**
+- **Hero Section**:
+  - Enhance spacing and alignment.
+  - Ensure step context is visually consistent.
+  
+- **Dashboard**:
+  - Improve card grouping and readability.
+  - Adjust typography or colors for better visual hierarchy.
+
+### 3. **Implement Frontend Changes**
+- Focus changes in `frontend-web`.
+- Utilize CSS for styling improvements:
+  - Use flexbox/grid for layout adjustments.
+  - Update margins, paddings, and font sizes as needed.
+
+Example CSS adjustments:
+```css
+/* Hero Section Styling */
+.hero {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Dashboard Card Styling */
+.dashboard-card {
+    margin: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+```
+
+### 4. **Check for Regressions**
+- Ensure no negative impact on the onboarding flow:
+  - Validate key elements and functionalities remain functional.
+
+### 5. **Manual Testing**
+- **Build the Project**: Run `npm run build` in `frontend-web`.
+- **Visual Inspection**: 
+  - Manually navigate through the onboarding and dashboard on the deployed site.
+  - Check for visual coherence and polish.
+
+### 6. **Update Unit Tests**
+- If any component behavior is affected, add tests using a framework like Jest.
+  
+Example test:
+```javascript
+// DashboardComponent.test.js
+
+import { render } from '@testing-library/react';
+import Dashboard from './Dashboard';
+
+test('renders dashboard with improved styles', () => {
+    const { getByText } = render(<Dashboard />);
+    expect(getByText(/Welcome/)).toBeInTheDocument();
+});
+```
+
+### 7. **Validate and Deploy**
+- Ensure no errors occur during builds.
+- Once complete, push the changes for automated checks and deploy.
+
+### Documentation
+- Document the changes and enhancements.
+- Ensure all improvements are listed for reviewers or QA.
+
+### Final Steps
+- **Commit Changes**: Make meaningful commit messages describing improvements.
+- **Push to Repository**: Allow CI/CD to handle the deployment pipeline.
+
+Feel free to ask if you need more detailed help or specific code snippets!
+Running backend tests...
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :test
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-05-07T19:53:41.639Z  INFO 24018 --- [backend-api] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-07T19:53:41.652Z  INFO 24018 --- [backend-api] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-07T19:53:41.666Z  INFO 24018 --- [backend-api] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.10.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 1s
+4 actionable tasks: 1 executed, 3 up-to-date
+Running frontend lint/build...
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+
+added 643 packages, and audited 644 packages in 26s
+
+235 packages are looking for funding
+  run `npm fund` for details
+
+4 moderate severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> frontend-web@0.1.0 lint
+> eslint
+
+
+/home/ubuntu/GreenGrid/frontend-web/src/lib/zoneSuggestions.ts
+  78:44  warning  'keepLeft' is defined but never used   @typescript-eslint/no-unused-vars
+  85:46  warning  'keepBelow' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 2 problems (0 errors, 2 warnings)
+
+npm error code ENOSPC
+npm error syscall write
+npm error errno -28
+npm error nospc ENOSPC: no space left on device, write
+npm error nospc There appears to be insufficient space on your system to finish.
+npm error nospc Clear up some disk space and try again.
+npm error A complete log of this run can be found in: /home/ubuntu/.npm/_logs/2026-05-07T19_54_19_517Z-debug-0.log
