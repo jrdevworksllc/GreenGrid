@@ -80,9 +80,9 @@ PY
 
 run_checks() {
   echo "Running backend tests..."
-  (cd "$WORKDIR/backend-api" && chmod +x gradlew && ./gradlew test --no-daemon)
+  (cd "$WORKDIR/backend-api" && chmod +x gradlew && ./gradlew test --no-daemon -Dorg.gradle.jvmargs="-Xms128m -Xmx256m")
   echo "Running frontend lint/build..."
-  (cd "$WORKDIR/frontend-web" && rm -rf node_modules && npm ci && npm run lint && npm run build)
+  (cd "$WORKDIR/frontend-web" && npm install --no-audit --no-fund && npm run lint && npm run build)
 }
 
 issue_json="$(api_get "https://api.github.com/repos/$REPO/issues?state=open&labels=ready,agent-safe&sort=created&direction=asc&per_page=1")"
