@@ -85,6 +85,13 @@ run_checks() {
   (cd "$WORKDIR/frontend-web" && npm install --no-audit --no-fund && npm run lint && npm run build)
 }
 
+cleanup_generated_artifacts() {
+  cd "$WORKDIR"
+  rm -rf .openclaw
+  rm -f AGENTS.md HEARTBEAT.md IDENTITY.md SOUL.md TOOLS.md USER.md worker.log
+  git checkout -- backend-api/gradlew 2>/dev/null || true
+}
+
 issue_json="$(api_get "https://api.github.com/repos/$REPO/issues?state=open&sort=created&direction=asc&per_page=50")"
 issue_one="$(echo "$issue_json" | python3 -c 'import sys, json; d=json.load(sys.stdin); m=[i for i in d if "pull_request" not in i and {"ready","agent-safe"}.issubset({l["name"] for l in i.get("labels",[])})]; print(json.dumps(m[0]) if m else "")')"
 issue_number="$(echo "$issue_one" | python3 -c 'import sys, json; s=sys.stdin.read().strip(); print(json.loads(s)["number"] if s else "")')"
@@ -132,6 +139,8 @@ set +e
 agent_exit=$?
 set -e
 
+cleanup_generated_artifacts
+
 if [[ $agent_exit -ne 0 ]]; then
   block_msg="$(python3 - <<'PY'
 import json
@@ -151,6 +160,24 @@ print(json.dumps({"body":"Worker run completed with no code changes. Task remain
 PY
 )"
   api_send POST "https://api.github.com/repos/$REPO/issues/$issue_number/comments" "$nochange_msg" >/dev/null
+  ready_payload="$(python3 - <<'PY'
+import json
+print(json.dumps({"labels":["ready","agent-safe"]}))
+PY
+)"
+  api_send PATCH "https://api.github.com/repos/$REPO/issues/$issue_number" "$ready_payload" >/dev/null
+  exit 0
+fi
+
+changed_files="$(git status --porcelain | awk '{print $2}')"
+meaningful_changes="$(echo "$changed_files" | grep -E '^(frontend-web/src/|frontend-web/public/|backend-api/src/|docs/)' || true)"
+if [[ -z "$meaningful_changes" ]]; then
+  no_meaningful_msg="$(python3 - <<'PY'
+import json
+print(json.dumps({"body":"Worker run produced only non-product artifacts. Skipping commit and returning issue to ready queue."}))
+PY
+)"
+  api_send POST "https://api.github.com/repos/$REPO/issues/$issue_number/comments" "$no_meaningful_msg" >/dev/null
   ready_payload="$(python3 - <<'PY'
 import json
 print(json.dumps({"labels":["ready","agent-safe"]}))
