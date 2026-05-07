@@ -64,6 +64,6 @@ Requirements:
 - Run relevant tests/build checks.
 - Summarize what changed and any follow-ups."
 
-"$OPENCLAW_BIN" agent --local --message "$prompt" || true
+"$OPENCLAW_BIN" agent --local --agent main --message "$prompt" || true
 
 echo "OpenClaw turn completed. Review, commit, and PR manually or extend this script with auto-commit/PR."
