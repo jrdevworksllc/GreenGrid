@@ -10,6 +10,14 @@ set -euo pipefail
 REPO="${REPO:-jrdevworksllc/GreenGrid}"
 OPENCLAW_BIN="${OPENCLAW_BIN:-$HOME/.npm-global/bin/openclaw}"
 WORKDIR="${WORKDIR:-$HOME/GreenGrid}"
+WORKER_ENV_FILE="${WORKER_ENV_FILE:-$HOME/.config/greengrid/worker.env}"
+
+if [[ -f "$WORKER_ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$WORKER_ENV_FILE"
+  set +a
+fi
 
 if [[ -z "${GITHUB_TOKEN:-}" ]]; then
   echo "GITHUB_TOKEN is required"
