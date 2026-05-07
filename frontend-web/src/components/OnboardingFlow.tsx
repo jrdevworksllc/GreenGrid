@@ -814,7 +814,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="human">Human eye-level</SelectItem>
-                          <SelectItem value="birds-eye">Bird's-eye masterplan</SelectItem>
+                          <SelectItem value="birds-eye">Bird&apos;s-eye masterplan</SelectItem>
                           <SelectItem value="both">Both perspectives</SelectItem>
                         </SelectContent>
                       </Select>
