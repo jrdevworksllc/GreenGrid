@@ -85,15 +85,15 @@ run_checks() {
   (cd "$WORKDIR/frontend-web" && npm install --no-audit --no-fund && npm run lint && npm run build)
 }
 
-issue_json="$(api_get "https://api.github.com/repos/$REPO/issues?state=open&labels=ready,agent-safe&sort=created&direction=asc&per_page=1")"
-issue_number="$(echo "$issue_json" | python3 -c 'import sys, json; d=json.load(sys.stdin); print(d[0]["number"] if d else "")')"
+issue_json="$(api_get "https://api.github.com/repos/$REPO/issues?state=open&sort=created&direction=asc&per_page=50")"
+issue_one="$(echo "$issue_json" | python3 -c 'import sys, json; d=json.load(sys.stdin); m=[i for i in d if "pull_request" not in i and {"ready","agent-safe"}.issubset({l["name"] for l in i.get("labels",[])})]; print(json.dumps(m[0]) if m else "")')"
+issue_number="$(echo "$issue_one" | python3 -c 'import sys, json; s=sys.stdin.read().strip(); print(json.loads(s)["number"] if s else "")')"
 
 if [[ -z "$issue_number" ]]; then
   echo "No ready tasks"
   exit 0
 fi
 
-issue_one="$(echo "$issue_json" | python3 -c 'import sys, json; d=json.load(sys.stdin); print(json.dumps(d[0]))')"
 title="$(echo "$issue_one" | python3 -c 'import sys, json; print(json.load(sys.stdin)["title"])')"
 issue_url="$(echo "$issue_one" | python3 -c 'import sys, json; print(json.load(sys.stdin)["html_url"])')"
 slug="$(echo "$title" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' | sed 's/^-//;s/-$//')"
