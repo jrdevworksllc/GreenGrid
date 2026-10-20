@@ -67,11 +67,11 @@ const stepDescriptions = [
 ] as const;
 
 const WHOLE_PROPERTY = "__whole_property__";
-const MARION_EXAMPLE = {
-  name: "Roosevelt Residence",
-  city: "Marion",
-  addressLine: "810 S. Roosevelt St.",
-  postalCode: "66861",
+const SAMPLE_PROPERTY = {
+  name: "Maplewood Yard",
+  city: "Maplewood",
+  addressLine: "100 Garden Lane",
+  postalCode: "67202",
 };
 
 export function OnboardingFlow(props: OnboardingFlowProps) {
@@ -109,10 +109,10 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const [plantSearch, setPlantSearch] = useState("");
   const [plantCatalogId, setPlantCatalogId] = useState("");
   const [plantingInlineError, setPlantingInlineError] = useState("");
-  const [propertyName, setPropertyName] = useState(MARION_EXAMPLE.name);
-  const [propertyCity, setPropertyCity] = useState(MARION_EXAMPLE.city);
-  const [propertyAddress, setPropertyAddress] = useState(MARION_EXAMPLE.addressLine);
-  const [propertyPostalCode, setPropertyPostalCode] = useState(MARION_EXAMPLE.postalCode);
+  const [propertyName, setPropertyName] = useState(SAMPLE_PROPERTY.name);
+  const [propertyCity, setPropertyCity] = useState(SAMPLE_PROPERTY.city);
+  const [propertyAddress, setPropertyAddress] = useState(SAMPLE_PROPERTY.addressLine);
+  const [propertyPostalCode, setPropertyPostalCode] = useState(SAMPLE_PROPERTY.postalCode);
   const [maintenancePreference, setMaintenancePreference] = useState("low");
   const [budgetBand, setBudgetBand] = useState("mid");
   const [colorMood, setColorMood] = useState("native-warm");
@@ -408,13 +408,13 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
                       variant="outline"
                       className="ml-2"
                       onClick={() => {
-                        setPropertyName(MARION_EXAMPLE.name);
-                        setPropertyCity(MARION_EXAMPLE.city);
-                        setPropertyAddress(MARION_EXAMPLE.addressLine);
-                        setPropertyPostalCode(MARION_EXAMPLE.postalCode);
+                        setPropertyName(SAMPLE_PROPERTY.name);
+                        setPropertyCity(SAMPLE_PROPERTY.city);
+                        setPropertyAddress(SAMPLE_PROPERTY.addressLine);
+                        setPropertyPostalCode(SAMPLE_PROPERTY.postalCode);
                       }}
                     >
-                      Use 810 S. Roosevelt St., Marion
+                      Use 100 Garden Lane, Maplewood
                     </Button>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">

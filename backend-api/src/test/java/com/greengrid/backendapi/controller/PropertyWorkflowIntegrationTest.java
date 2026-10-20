@@ -39,11 +39,11 @@ class PropertyWorkflowIntegrationTest {
     void createPropertyThenCreateAndListZones() throws Exception {
         String propertyPayload = """
                 {
-                  "name": "Roosevelt Residence",
-                  "addressLine": "810 S. Roosevelt St.",
-                  "city": "Marion",
+                  "name": "Maplewood Yard",
+                  "addressLine": "100 Garden Lane",
+                  "city": "Maplewood",
                   "stateCode": "KS",
-                  "postalCode": "66861",
+                  "postalCode": "67202",
                   "countryCode": "US"
                 }
                 """;
@@ -54,8 +54,8 @@ class PropertyWorkflowIntegrationTest {
                                 .content(propertyPayload)
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Roosevelt Residence"))
-                .andExpect(jsonPath("$.city").value("Marion"))
+                .andExpect(jsonPath("$.name").value("Maplewood Yard"))
+                .andExpect(jsonPath("$.city").value("Maplewood"))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -95,10 +95,10 @@ class PropertyWorkflowIntegrationTest {
         String invalidPayload = """
                 {
                   "name": "",
-                  "addressLine": "810 S. Roosevelt St.",
-                  "city": "Marion",
+                  "addressLine": "100 Garden Lane",
+                  "city": "Maplewood",
                   "stateCode": "KS",
-                  "postalCode": "66861",
+                  "postalCode": "67202",
                   "countryCode": "US"
                 }
                 """;
